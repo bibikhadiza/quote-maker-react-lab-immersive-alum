@@ -1,11 +1,38 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import QuoteCard from '../components/QuoteCard';
+import { bindActionCreators } from 'redux';
+import { removeQuote, upvoteQuote, downvoteQuote } from '../actions/quotes';
+
 
 class Quotes extends Component {
+  constructor(){
+    super();
+    this.handleRemoveQuote = this.handleRemoveQuote.bind(this);
+    this.handleUpvoteQuote = this.handleUpvoteQuote.bind(this);
+    this.handleDownvoteQuote = this.handleDownvoteQuote.bind(this);
+  }
+
+  handleRemoveQuote(ev, id) {
+    this.props.removeQuote(id);
+  }
+
+  handleUpvoteQuote(ev, id) {
+    this.props.upvoteQuote(id);
+  }
+
+  handleDownvoteQuote(ev, id){
+     this.props.downvoteQuote(id);
+  }
 
   render() {
-    return (
+     const quotes = this.props.quotes.map( quote => <QuoteCard quote={quote}
+       removeQuote={event => this.handleRemoveQuote(event, quote.id)}
+       upvoteQuote={event => this.handleUpvoteQuote(event, quote.id)}
+       downvoteQuote={event => this.handleDownvoteQuote(event, quote.id)}
+       />)
+
+     return (
       <div>
         <hr />
         <div className="row justify-content-center">
@@ -15,11 +42,7 @@ class Quotes extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-4">
-              {/* 
-                TODO: 
-
-                Render Quotes With QuoteCard component and pass down callback props for removing, upvoting and downvoting quotes
-               */}
+              {quotes}
             </div>
           </div>
         </div>
@@ -28,4 +51,16 @@ class Quotes extends Component {
   }
 }
 
-export default connect(null, {})(Quotes);
+const mapStateToProps = (state) => {
+  return {quotes: state.quotes}
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({
+    removeQuote,
+    upvoteQuote,
+    downvoteQuote
+  }, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Quotes);
